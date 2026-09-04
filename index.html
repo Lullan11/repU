@@ -1,115 +1,1186 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Plataforma · Publicaciones</title>
+  <title>repU · Universidad de Pamplona</title>
+
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f7fa;
-      padding: 2rem 1rem;
-      color: #1a2634;
+    /* ============================================================
+       RESET Y BASE
+    ============================================================ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    .container {
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      min-height: 100vh;
+      padding-top: 72px;
+    }
+
+    ::selection {
+      background: #e74c3c;
+      color: #fff;
+    }
+
+    /* ============================================================
+       NAVBAR
+    ============================================================ */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      padding: 0 2rem;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 1.6rem;
+      color: #1a1a2e;
+    }
+
+    .navbar-brand .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #c0392b, #e74c3c);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 800;
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
+
+    .navbar-brand span {
+      background: linear-gradient(135deg, #c0392b, #e74c3c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .navbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .navbar-actions .btn-panel {
+      padding: 0.5rem 1.4rem;
+      background: linear-gradient(135deg, #c0392b, #e74c3c);
+      color: #fff;
+      border: none;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
+
+    .navbar-actions .btn-panel:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(231, 76, 60, 0.4);
+    }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    .hero {
+      text-align: center;
+      padding: 2.5rem 1rem 1.5rem;
       max-width: 900px;
       margin: 0 auto;
     }
-    h1 {
-      font-size: 2.2rem;
-      margin-bottom: 0.5rem;
+
+    .hero h1 {
+      font-size: 2.8rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #1a1a2e, #c0392b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    .sub {
-      color: #6b7a8a;
-      margin-bottom: 2rem;
-    }
-    .post {
-      background: #fff;
-      padding: 1.5rem;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      margin-bottom: 2rem;
-    }
-    .post-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-    .post-text {
-      white-space: pre-wrap;
-      margin-bottom: 1rem;
-      line-height: 1.5;
-    }
-    .post-files {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.8rem;
+
+    .hero p {
+      color: #4a5568;
+      font-size: 1.1rem;
       margin-top: 0.5rem;
     }
-    .post-files a {
+
+    .hero p i {
+      color: #e74c3c;
+    }
+
+    /* ============================================================
+       STATS
+    ============================================================ */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      padding: 1rem 2rem;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .stats-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #6b7280;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .stats-item i {
+      color: #e74c3c;
+      width: 1.4rem;
+      text-align: center;
+    }
+
+    .stats-item .num {
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+
+    /* ============================================================
+       GRID
+    ============================================================ */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem 3rem;
+    }
+
+    .posts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.8rem;
+    }
+
+    /* ============================================================
+       POST CARD
+    ============================================================ */
+    .post-card {
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .post-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 48px rgba(192, 57, 43, 0.08);
+      border-color: rgba(192, 57, 43, 0.12);
+    }
+
+    .post-media {
+      width: 100%;
+      background: #f1f2f6;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .post-media img,
+    .post-media video {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s;
+    }
+
+    .post-card:hover .post-media img {
+      transform: scale(1.02);
+    }
+
+    .post-media video {
+      height: 240px;
+      background: #000;
+    }
+
+    .post-media .zoom-icon {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .post-card:hover .post-media .zoom-icon {
+      opacity: 1;
+    }
+
+    .post-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      pointer-events: none;
+    }
+
+    .post-content {
+      padding: 1.2rem 1.4rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .post-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .post-date {
+      font-size: 0.7rem;
+      color: #9ca3af;
+      white-space: nowrap;
+      font-weight: 500;
+      background: #f3f4f6;
+      padding: 0.15rem 0.7rem;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .post-date i {
+      font-size: 0.6rem;
+    }
+
+    .post-body {
+      color: #4b5563;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-bottom: 0.8rem;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .post-actions-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 0.2rem;
+      padding-top: 0.6rem;
+      border-top: 1px solid #f3f4f6;
+      flex-wrap: wrap;
+    }
+
+    .post-actions-bar .btn-action {
       display: inline-flex;
       align-items: center;
       gap: 0.3rem;
       padding: 0.2rem 0.8rem;
-      background: #e9ecf2;
-      border-radius: 20px;
+      border: none;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
       text-decoration: none;
-      color: #1a2634;
-      font-size: 0.9rem;
-      transition: background 0.2s;
+      font-family: inherit;
     }
-    .post-files a:hover {
-      background: #d5dce6;
+
+    .post-actions-bar .btn-view {
+      background: #4a6cf7;
+      color: #fff;
     }
-    .post img, .post video {
-      max-width: 100%;
-      border-radius: 8px;
+
+    .post-actions-bar .btn-view:hover {
+      background: #3a5bd9;
+      transform: scale(1.02);
+    }
+
+    .post-actions-bar .btn-copy {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .post-actions-bar .btn-copy:hover {
+      background: #d1d5db;
+    }
+
+    .post-actions-bar .btn-copy.copied {
+      background: #27ae60;
+      color: #fff;
+    }
+
+    /* ============================================================
+       ARCHIVOS
+    ============================================================ */
+    .post-files {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
       margin-top: 0.5rem;
     }
-    .empty {
-      color: #8a9aa8;
-      font-style: italic;
+
+    .file-item {
+      background: #f8f9fc;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #f1f2f6;
+      transition: border 0.2s;
+    }
+
+    .file-item:hover {
+      border-color: #e5e7eb;
+    }
+
+    .file-preview {
+      width: 100%;
+    }
+
+    .file-preview img {
+      width: 100%;
+      max-height: 180px;
+      object-fit: cover;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .file-preview img:hover {
+      opacity: 0.9;
+    }
+
+    .file-preview video {
+      width: 100%;
+      max-height: 180px;
+      background: #000;
+    }
+
+    .file-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.4rem 0.8rem;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .file-name {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: #374151;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .file-name i {
+      color: #e74c3c;
+      width: 1rem;
       text-align: center;
-      padding: 2rem;
     }
-    .meta {
-      color: #8a9aa8;
-      font-size: 0.85rem;
-      margin-top: 0.5rem;
+
+    .file-actions {
+      display: flex;
+      gap: 0.3rem;
+    }
+
+    .file-actions a,
+    .file-actions button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      padding: 0.15rem 0.6rem;
+      border-radius: 30px;
+      text-decoration: none;
+      font-size: 0.7rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+    }
+
+    .file-actions .btn-download {
+      background: #e74c3c;
+      color: #fff;
+    }
+
+    .file-actions .btn-download:hover {
+      background: #c0392b;
+      transform: scale(1.02);
+    }
+
+    .file-actions .btn-view {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .file-actions .btn-view:hover {
+      background: #d1d5db;
+    }
+
+    .file-actions .btn-downloading {
+      background: #f39c12;
+      color: #fff;
+      cursor: wait;
+      opacity: 0.7;
+    }
+
+    .file-actions .btn-downloading:hover {
+      transform: none;
+    }
+
+    /* ============================================================
+       MODAL DE PUBLICACIÓN COMPLETA
+    ============================================================ */
+    .post-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10000;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .post-modal.active {
+      display: flex;
+    }
+
+    .post-modal-content {
+      background: #fff;
+      border-radius: 24px;
+      max-width: 700px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+      position: relative;
+      animation: modalFadeIn 0.3s ease;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .post-modal-content .close-modal-btn {
+      position: sticky;
+      top: 0;
+      float: right;
+      background: #f3f4f6;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6b7280;
+      z-index: 10;
+    }
+
+    .post-modal-content .close-modal-btn:hover {
+      background: #e5e7eb;
+      color: #1a1a2e;
+      transform: rotate(90deg);
+    }
+
+    .post-modal-content .modal-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-top: 0.2rem;
+      margin-bottom: 0.3rem;
+      padding-right: 3rem;
+    }
+
+    .post-modal-content .modal-date {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .post-modal-content .modal-body {
+      color: #374151;
+      font-size: 1rem;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-bottom: 1.5rem;
+    }
+
+    .post-modal-content .modal-files {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .post-modal-content .modal-files .file-item {
+      background: #f8f9fc;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #f1f2f6;
+    }
+
+    .post-modal-content .modal-files .file-item .file-preview img {
+      max-height: 400px;
+      object-fit: contain;
+    }
+
+    .post-modal-content .modal-files .file-item .file-preview video {
+      max-height: 400px;
+    }
+
+    /* Scrollbar modal */
+    .post-modal-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .post-modal-content::-webkit-scrollbar-track {
+      background: #f3f4f6;
+      border-radius: 8px;
+    }
+
+    .post-modal-content::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 8px;
+    }
+
+    .post-modal-content::-webkit-scrollbar-thumb:hover {
+      background: #9ca3af;
+    }
+
+    /* ============================================================
+       MODAL DE IMÁGENES (ampliación)
+    ============================================================ */
+    .image-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.92);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      cursor: pointer;
+    }
+
+    .image-modal.active {
+      display: flex;
+    }
+
+    .image-modal img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .image-modal .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      color: #fff;
+      font-size: 2.5rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .image-modal .close-modal:hover {
+      transform: scale(1.1);
+    }
+
+    /* ============================================================
+       EMPTY / LOADING
+    ============================================================ */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #9ca3af;
+    }
+
+    .empty-state i {
+      font-size: 3.5rem;
+      color: #d1d5db;
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+      color: #6b7280;
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+
+    .loading-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 0;
+      color: #9ca3af;
+    }
+
+    .loading-state i {
+      font-size: 2.5rem;
+      animation: spin 1s linear infinite;
+      display: block;
+      margin-bottom: 1rem;
+      color: #e74c3c;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 768px) {
+      body {
+        padding-top: 64px;
+      }
+
+      .navbar {
+        padding: 0 1rem;
+        height: 64px;
+      }
+
+      .navbar-brand {
+        font-size: 1.2rem;
+      }
+
+      .navbar-brand .logo-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+      }
+
+      .navbar-actions .btn-panel {
+        padding: 0.4rem 1rem;
+        font-size: 0.75rem;
+      }
+
+      .navbar-actions .btn-panel span {
+        display: none;
+      }
+
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .posts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .post-media img,
+      .post-media video {
+        height: 180px;
+      }
+
+      .container {
+        padding: 0 1rem 2rem;
+      }
+
+      .post-modal-content {
+        padding: 1.2rem;
+        margin: 1rem;
+      }
+
+      .post-modal-content .modal-title {
+        font-size: 1.3rem;
+        padding-right: 2.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stats-bar {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.8rem;
+      }
+
+      .stats-item {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .hero h1 {
+        font-size: 1.6rem;
+      }
+
+      .post-modal {
+        padding: 0.5rem;
+      }
+
+      .post-modal-content {
+        padding: 1rem;
+        border-radius: 16px;
+      }
     }
   </style>
 </head>
+
 <body>
+
+  <!-- ============================================================
+       NAVBAR
+  ============================================================ -->
+  <nav class="navbar">
+    <a href="#" class="navbar-brand">
+      <div class="logo-icon">r</div>
+      <span>repU</span>
+    </a>
+    <div class="navbar-actions">
+      <a href="login.html" class="btn-panel">
+        <i class="fas fa-user-shield"></i> <span>Panel</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ============================================================
+       HERO
+  ============================================================ -->
+  <section class="hero">
+    <h1>repU</h1>
+    <p>
+      <i class="fas fa-users"></i> Comunicación social ·
+      <i class="fas fa-folder-open"></i> Repositorio de trabajo de la
+      <strong>Universidad de Pamplona</strong>
+    </p>
+  </section>
+
+  <!-- ============================================================
+       STATS
+  ============================================================ -->
+  <div class="stats-bar" id="stats">
+    <div class="stats-item"><i class="fas fa-file-alt"></i> <span class="num" id="postCount">0</span> publicaciones
+    </div>
+    <div class="stats-item"><i class="fas fa-image"></i> <span class="num" id="imageCount">0</span> imágenes</div>
+    <div class="stats-item"><i class="fas fa-video"></i> <span class="num" id="videoCount">0</span> videos</div>
+    <div class="stats-item"><i class="fas fa-file-pdf"></i> <span class="num" id="pdfCount">0</span> documentos</div>
+  </div>
+
+  <!-- ============================================================
+       PUBLICACIONES
+  ============================================================ -->
   <div class="container">
-    <h1>📢 Publicaciones</h1>
-    <button><a href="login.html">Panel de control repU</a></button>
-    <p class="sub">Contenido generado desde el panel de administración</p>
-    <div id="postsContainer">
-      <p class="empty">Cargando publicaciones...</p>
+    <div class="posts-grid" id="postsContainer">
+      <div class="loading-state">
+        <i class="fas fa-spinner"></i>
+        <p>Cargando publicaciones...</p>
+      </div>
     </div>
   </div>
 
+  <!-- ============================================================
+       MODAL DE PUBLICACIÓN COMPLETA
+  ============================================================ -->
+  <div class="post-modal" id="postModal">
+    <div class="post-modal-content">
+      <button class="close-modal-btn" onclick="closePostModal()">✕</button>
+      <div id="modalContent">
+        <!-- El contenido se inyecta aquí desde JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL DE IMÁGENES (ampliación)
+  ============================================================ -->
+  <div class="image-modal" id="imageModal" onclick="closeImageModal()">
+    <span class="close-modal">&times;</span>
+    <img id="modalImage" src="" alt="Vista ampliada" />
+  </div>
+
+  <!-- ============================================================
+       SCRIPT
+  ============================================================ -->
   <script>
-    // ----- CONFIGURACIÓN (reemplaza con tus credenciales) -----
+    // ================================================================
+    // 1. CONFIGURACIÓN DE FIREBASE
+    // ================================================================
     const firebaseConfig = {
-      apiKey: "TU_API_KEY",
-      authDomain: "TU_PROYECTO.firebaseapp.com",
-      projectId: "TU_PROYECTO",
-      storageBucket: "TU_PROYECTO.appspot.com",
-      messagingSenderId: "TU_SENDER_ID",
-      appId: "TU_APP_ID"
+      apiKey: "AIzaSyCk5XknbZinI_-QaXkR6g22-HDuSvhYFRc",
+      authDomain: "repou-f3d37.firebaseapp.com",
+      projectId: "repou-f3d37",
+      storageBucket: "repou-f3d37.firebasestorage.app",
+      messagingSenderId: "212576901079",
+      appId: "1:212576901079:web:9e5ad2f2d857d5635d1d92"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // ----- Cargar publicaciones -----
+    // ================================================================
+    // 2. ELEMENTOS
+    // ================================================================
     const container = document.getElementById('postsContainer');
+    const postCount = document.getElementById('postCount');
+    const imageCount = document.getElementById('imageCount');
+    const videoCount = document.getElementById('videoCount');
+    const pdfCount = document.getElementById('pdfCount');
+    const imageModal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const postModal = document.getElementById('postModal');
+    const modalContent = document.getElementById('modalContent');
 
+    // ================================================================
+    // 3. UTILIDADES
+    // ================================================================
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function formatDate(timestamp) {
+      if (!timestamp) return '';
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      let hours = date.getHours();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return {
+        date: date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }),
+        time: hours + ':' + minutes + ' ' + ampm
+      };
+    }
+
+    function getFileIcon(type) {
+      if (!type) return 'fa-file';
+      if (type.startsWith('image/')) return 'fa-image';
+      if (type.startsWith('video/')) return 'fa-video';
+      if (type === 'application/pdf') return 'fa-file-pdf';
+      return 'fa-file';
+    }
+
+    function getFileEmoji(type) {
+      if (!type) return '📄';
+      if (type.startsWith('image/')) return '🖼️';
+      if (type.startsWith('video/')) return '🎬';
+      if (type === 'application/pdf') return '📕';
+      return '📄';
+    }
+
+    function getBadgeLabel(url) {
+      if (!url) return '';
+      if (url.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) return '🖼️ Imagen';
+      if (url.match(/\.(mp4|webm|ogg|mov)$/i)) return '🎬 Video';
+      if (url.match(/\.(pdf)$/i)) return '📕 PDF';
+      return '📄 Archivo';
+    }
+
+    // ================================================================
+    // 4. MODALES
+    // ================================================================
+
+    // Modal de imagen
+    function openImageModal(src) {
+      modalImg.src = src;
+      imageModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeImageModal() {
+      imageModal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeImageModal();
+        closePostModal();
+      }
+    });
+
+    // Modal de publicación completa
+    function openPostModal(postId) {
+      const postData = window._postsData ? window._postsData[postId] : null;
+      if (!postData) {
+        console.error('Publicación no encontrada:', postId);
+        return;
+      }
+
+      const dateInfo = formatDate(postData.createdAt);
+      const dateStr = dateInfo.date + ' · ' + dateInfo.time;
+
+      let filesHtml = '';
+      const files = postData.archivos || [];
+
+      files.forEach(f => {
+        const fileUrl = f.url || '';
+        const fileName = f.name || 'archivo';
+        const fileType = f.type || '';
+        const isPdf = fileType === 'application/pdf' || fileName.toLowerCase().endsWith('.pdf');
+
+        let previewHtml = '';
+        if (fileType.startsWith('image/')) {
+          previewHtml = `
+            <div class="file-preview">
+              <img src="${fileUrl}" alt="${fileName}" loading="lazy" style="max-height:400px; object-fit:contain; cursor:pointer;" onclick="event.stopPropagation(); openImageModal('${fileUrl}')" />
+            </div>
+          `;
+        } else if (fileType.startsWith('video/')) {
+          previewHtml = `
+            <div class="file-preview">
+              <video controls style="max-height:400px; width:100%;"><source src="${fileUrl}" type="${fileType}"></video>
+            </div>
+          `;
+        }
+
+        let actionsHtml = '';
+        if (isPdf) {
+          actionsHtml = `
+            <a href="${fileUrl}" target="_blank" class="btn-view"><i class="fas fa-eye"></i> Ver PDF</a>
+            <button onclick="downloadFile('${fileUrl}', '${fileName}', this)" class="btn-download"><i class="fas fa-download"></i> Descargar</button>
+          `;
+        } else if (fileType.startsWith('image/')) {
+          actionsHtml = `
+            <button onclick="downloadFile('${fileUrl}', '${fileName}', this)" class="btn-download"><i class="fas fa-download"></i> Descargar</button>
+          `;
+        } else if (fileType.startsWith('video/')) {
+          actionsHtml = `
+            <button onclick="downloadFile('${fileUrl}', '${fileName}', this)" class="btn-download"><i class="fas fa-download"></i> Descargar</button>
+          `;
+        } else {
+          actionsHtml = `
+            <a href="${fileUrl}" target="_blank" class="btn-view"><i class="fas fa-eye"></i> Ver</a>
+            <button onclick="downloadFile('${fileUrl}', '${fileName}', this)" class="btn-download"><i class="fas fa-download"></i> Descargar</button>
+          `;
+        }
+
+        filesHtml += `
+          <div class="file-item">
+            ${previewHtml}
+            <div class="file-info">
+              <span class="file-name">
+                <i class="fas ${getFileIcon(fileType)}"></i>
+                ${getFileEmoji(fileType)} ${fileName}
+              </span>
+              <div class="file-actions">
+                ${actionsHtml}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      modalContent.innerHTML = `
+        <h2 class="modal-title">${escapeHtml(postData.titulo || 'Sin título')}</h2>
+        <div class="modal-date"><i class="far fa-clock"></i> ${dateStr}</div>
+        <div class="modal-body">${escapeHtml(postData.texto || '')}</div>
+        ${filesHtml ? `<div class="modal-files">${filesHtml}</div>` : ''}
+      `;
+
+      postModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePostModal() {
+      postModal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // ================================================================
+    // 5. FUNCIÓN PARA DESCARGAR ARCHIVOS
+    // ================================================================
+    async function downloadFile(url, filename, button) {
+      if (!url) return;
+      const originalText = button.innerHTML;
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Descargando...';
+      button.className = 'btn-download btn-downloading';
+      button.disabled = true;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Error al descargar el archivo');
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = objectUrl;
+        link.download = filename || url.split('/').pop() || 'archivo';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+
+        button.innerHTML = '<i class="fas fa-check"></i> Descargado';
+        button.className = 'btn-download';
+        button.style.background = '#27ae60';
+        setTimeout(() => {
+          button.innerHTML = originalText;
+          button.className = 'btn-download';
+          button.style.background = '';
+          button.disabled = false;
+        }, 2000);
+      } catch (error) {
+        console.error('Error descargando:', error);
+        button.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+        button.className = 'btn-download';
+        button.style.background = '#e74c3c';
+        setTimeout(() => {
+          button.innerHTML = originalText;
+          button.className = 'btn-download';
+          button.style.background = '';
+          button.disabled = false;
+        }, 3000);
+      }
+    }
+
+    // ================================================================
+    // 6. FUNCIÓN PARA COPIAR TEXTO (MANEJO SEGURO)
+    // ================================================================
+    function copyText(element) {
+      // Obtener el texto del elemento data-text
+      const text = element.getAttribute('data-text');
+      if (!text) {
+        console.error('No hay texto para copiar');
+        return;
+      }
+
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      textarea.style.top = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.select();
+
+      try {
+        const success = document.execCommand('copy');
+        if (success) {
+          element.classList.add('copied');
+          const originalText = element.innerHTML;
+          element.innerHTML = '<i class="fas fa-check"></i> Copiado';
+          setTimeout(() => {
+            element.classList.remove('copied');
+            element.innerHTML = originalText;
+          }, 2500);
+        } else {
+          alert('No se pudo copiar el texto. Selecciona manualmente y copia.');
+        }
+      } catch (err) {
+        console.error('Error al copiar:', err);
+        alert('No se pudo copiar el texto. Selecciona manualmente y copia.');
+      }
+
+      document.body.removeChild(textarea);
+    }
+
+    // ================================================================
+    // 7. CARGAR PUBLICACIONES
+    // ================================================================
     async function loadPosts() {
       try {
         const snapshot = await db.collection('publicaciones')
@@ -117,55 +1188,298 @@
           .get();
 
         if (snapshot.empty) {
-          container.innerHTML = '<p class="empty">No hay publicaciones disponibles.</p>';
+          container.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <h3>No hay publicaciones</h3>
+              <p>Vuelve más tarde, pronto habrá contenido.</p>
+            </div>
+          `;
+          updateStats(0, 0, 0, 0);
           return;
         }
 
         let html = '';
+        let totalPosts = 0;
+        let totalImages = 0;
+        let totalVideos = 0;
+        let totalPdfs = 0;
+
+        window._postsData = {};
+
         snapshot.forEach(doc => {
           const data = doc.data();
+          const docId = doc.id;
           const files = data.archivos || [];
-          let filesHtml = '';
+          const urlArchivo = data.urlArchivo || '';
+          totalPosts++;
+
+          window._postsData[docId] = {
+            titulo: data.titulo || 'Sin título',
+            texto: data.texto || '',
+            createdAt: data.createdAt,
+            archivos: files
+          };
+
           files.forEach(f => {
-            let icon = '📄';
-            if (f.type.startsWith('image/')) {
-              icon = '🖼️';
-              // Mostrar imagen
-              filesHtml += `<img src="${f.url}" alt="${f.name}" style="max-width:100%;border-radius:8px;margin-top:8px;" />`;
-            } else if (f.type.startsWith('video/')) {
-              icon = '🎬';
-              filesHtml += `<video controls style="max-width:100%;border-radius:8px;margin-top:8px;"><source src="${f.url}" type="${f.type}"></video>`;
-            } else {
-              icon = '📕';
-              filesHtml += `<a href="${f.url}" target="_blank" download="${f.name}">${icon} ${f.name}</a>`;
+            if (f.type && f.type.startsWith('image/')) totalImages++;
+            else if (f.type && f.type.startsWith('video/')) totalVideos++;
+            else if (f.type === 'application/pdf') totalPdfs++;
+          });
+          if (urlArchivo && files.length === 0) {
+            if (urlArchivo.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) totalImages++;
+            else if (urlArchivo.match(/\.(mp4|webm|ogg|mov)$/i)) totalVideos++;
+            else if (urlArchivo.match(/\.(pdf)$/i)) totalPdfs++;
+          }
+
+          const title = data.titulo || 'Sin título';
+          const text = data.texto || '';
+          const dateInfo = formatDate(data.createdAt);
+          const dateStr = dateInfo.date + ' · ' + dateInfo.time;
+
+          let mediaHtml = '';
+          let badgeLabel = '';
+          let mainFileUrl = '';
+          let mainFileName = '';
+          let mainFileType = '';
+          let foundMedia = false;
+
+          // MEDIA PRINCIPAL
+          if (urlArchivo) {
+            const isImage = urlArchivo.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i);
+            const isVideo = urlArchivo.match(/\.(mp4|webm|ogg|mov)$/i);
+            if (isImage) {
+              mediaHtml = `
+                <img src="${urlArchivo}" alt="${title}" loading="lazy" onclick="event.stopPropagation(); openImageModal('${urlArchivo}')" />
+                <div class="zoom-icon"><i class="fas fa-search-plus"></i></div>
+              `;
+              badgeLabel = '🖼️ Imagen';
+              mainFileUrl = urlArchivo;
+              mainFileName = urlArchivo.split('/').pop() || 'imagen';
+              mainFileType = 'image';
+              foundMedia = true;
+            } else if (isVideo) {
+              mediaHtml = `<video controls><source src="${urlArchivo}" type="video/mp4"></video>`;
+              badgeLabel = '🎬 Video';
+              mainFileUrl = urlArchivo;
+              mainFileName = urlArchivo.split('/').pop() || 'video';
+              mainFileType = 'video';
+              foundMedia = true;
             }
+          }
+
+          if (!foundMedia && files.length > 0) {
+            const firstFile = files[0];
+            if (firstFile.type && firstFile.type.startsWith('image/')) {
+              mediaHtml = `
+                <img src="${firstFile.url}" alt="${firstFile.name}" loading="lazy" onclick="event.stopPropagation(); openImageModal('${firstFile.url}')" />
+                <div class="zoom-icon"><i class="fas fa-search-plus"></i></div>
+              `;
+              badgeLabel = '🖼️ Imagen';
+              mainFileUrl = firstFile.url;
+              mainFileName = firstFile.name;
+              mainFileType = 'image';
+              foundMedia = true;
+            } else if (firstFile.type && firstFile.type.startsWith('video/')) {
+              mediaHtml = `<video controls><source src="${firstFile.url}" type="${firstFile.type}"></video>`;
+              badgeLabel = '🎬 Video';
+              mainFileUrl = firstFile.url;
+              mainFileName = firstFile.name;
+              mainFileType = 'video';
+              foundMedia = true;
+            }
+          }
+
+          // Placeholder
+          if (!mediaHtml) {
+            let hasPdf = false;
+            let hasImage = false;
+            let hasVideo = false;
+
+            files.forEach(f => {
+              if (f.type === 'application/pdf' || (f.name && f.name.toLowerCase().endsWith('.pdf'))) hasPdf = true;
+              if (f.type && f.type.startsWith('image/')) hasImage = true;
+              if (f.type && f.type.startsWith('video/')) hasVideo = true;
+            });
+
+            if (urlArchivo && urlArchivo.match(/\.(pdf)$/i)) hasPdf = true;
+
+            let icon = 'fa-file-alt';
+            let label = 'Sin archivo adjunto';
+            let color = '#9ca3af';
+
+            if (hasPdf) {
+              icon = 'fa-file-pdf';
+              label = '📕 PDF adjunto';
+              color = '#e74c3c';
+            } else if (hasImage) {
+              icon = 'fa-image';
+              label = '🖼️ Imagen adjunta';
+              color = '#6c5ce7';
+            } else if (hasVideo) {
+              icon = 'fa-video';
+              label = '🎬 Video adjunto';
+              color = '#e74c3c';
+            }
+
+            mediaHtml = `
+              <div style="height:120px; background:linear-gradient(135deg, #f8f9fa, #e9ecef); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:0.5rem; border-bottom:2px solid ${color}33;">
+                <i class="fas ${icon}" style="font-size:2rem; color:${color}; opacity:0.6;"></i>
+                <span style="color:${color}; font-weight:500; font-size:0.85rem;">${label}</span>
+              </div>
+            `;
+          }
+
+          // ===== ARCHIVOS =====
+          let filesHtml = '';
+          const processedUrls = new Set();
+          const filesToShow = foundMedia && files.length > 0 ? files.slice(1) : files;
+
+          filesToShow.forEach(f => {
+            const fileUrl = f.url || '';
+            const fileName = f.name || 'archivo';
+            const fileType = f.type || '';
+
+            if (processedUrls.has(fileUrl)) return;
+            processedUrls.add(fileUrl);
+
+            const isPdf = fileType === 'application/pdf' || fileName.toLowerCase().endsWith('.pdf');
+
+            let previewHtml = '';
+            if (fileType.startsWith('image/') && !foundMedia) {
+              previewHtml = `
+                <div class="file-preview">
+                  <img src="${fileUrl}" alt="${fileName}" loading="lazy" style="max-height:120px; object-fit:cover; cursor:pointer;" onclick="event.stopPropagation(); openImageModal('${fileUrl}')" />
+                </div>
+              `;
+            } else if (fileType.startsWith('video/') && !foundMedia) {
+              previewHtml = `
+                <div class="file-preview">
+                  <video controls style="max-height:120px;"><source src="${fileUrl}" type="${fileType}"></video>
+                </div>
+              `;
+            }
+
+            let actionsHtml = '';
+            if (isPdf) {
+              actionsHtml = `
+                <a href="${fileUrl}" target="_blank" class="btn-view"><i class="fas fa-eye"></i> Ver PDF</a>
+                <button onclick="downloadFile('${fileUrl}', '${fileName}', this)" class="btn-download"><i class="fas fa-download"></i> Descargar</button>
+              `;
+            } else if (fileType.startsWith('image/')) {
+              actionsHtml = `
+                <button onclick="downloadFile('${fileUrl}', '${fileName}', this)" class="btn-download"><i class="fas fa-download"></i> Descargar</button>
+              `;
+            } else if (fileType.startsWith('video/')) {
+              actionsHtml = `
+                <button onclick="downloadFile('${fileUrl}', '${fileName}', this)" class="btn-download"><i class="fas fa-download"></i> Descargar</button>
+              `;
+            } else {
+              actionsHtml = `
+                <a href="${fileUrl}" target="_blank" class="btn-view"><i class="fas fa-eye"></i> Ver</a>
+                <button onclick="downloadFile('${fileUrl}', '${fileName}', this)" class="btn-download"><i class="fas fa-download"></i> Descargar</button>
+              `;
+            }
+
+            filesHtml += `
+              <div class="file-item">
+                ${previewHtml}
+                <div class="file-info">
+                  <span class="file-name">
+                    <i class="fas ${getFileIcon(fileType)}"></i>
+                    ${getFileEmoji(fileType)} ${fileName}
+                  </span>
+                  <div class="file-actions">
+                    ${actionsHtml}
+                  </div>
+                </div>
+              </div>
+            `;
           });
 
+          // Descarga de imagen principal
+          if (mainFileType === 'image' && mainFileUrl && !processedUrls.has(mainFileUrl)) {
+            processedUrls.add(mainFileUrl);
+            const fileName = mainFileUrl.split('/').pop() || 'imagen';
+            filesHtml += `
+              <div class="file-item">
+                <div class="file-info">
+                  <span class="file-name">
+                    <i class="fas fa-image"></i>
+                    🖼️ ${fileName}
+                  </span>
+                  <div class="file-actions">
+                    <button onclick="downloadFile('${mainFileUrl}', '${fileName}', this)" class="btn-download"><i class="fas fa-download"></i> Descargar imagen</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+
+          // 🔥 CORREGIDO: usar data-text en lugar de onclick con string
+          const escapedText = text ? text.replace(/\\/g, '\\\\').replace(/'/g, "\\'") : '';
+
           html += `
-            <div class="post">
-              <div class="post-title">${escapeHtml(data.titulo || 'Sin título')}</div>
-              <div class="post-text">${escapeHtml(data.texto || '')}</div>
-              <div class="post-files">${filesHtml}</div>
-              <div class="meta">${data.createdAt ? new Date(data.createdAt.toMillis()).toLocaleDateString() : ''}</div>
+            <div class="post-card">
+              <div class="post-media">
+                ${mediaHtml}
+                ${badgeLabel ? `<span class="post-badge">${badgeLabel}</span>` : ''}
+              </div>
+              <div class="post-content">
+                <div class="post-header">
+                  <div class="post-title">${escapeHtml(title)}</div>
+                  <span class="post-date"><i class="far fa-clock"></i> ${dateStr}</span>
+                </div>
+                ${text ? `
+                  <div class="post-body">${escapeHtml(text)}</div>
+                ` : ''}
+                <div class="post-actions-bar">
+                  <button class="btn-action btn-view" onclick="openPostModal('${docId}')">
+                    <i class="fas fa-eye"></i> Ver publicación
+                  </button>
+                  ${text ? `
+                    <button class="btn-action btn-copy" data-text="${escapedText}" onclick="copyText(this)">
+                      <i class="fas fa-copy"></i> Copiar texto
+                    </button>
+                  ` : ''}
+                </div>
+                ${filesHtml ? `<div class="post-files">${filesHtml}</div>` : ''}
+              </div>
             </div>
           `;
         });
 
         container.innerHTML = html;
+        updateStats(totalPosts, totalImages, totalVideos, totalPdfs);
+
       } catch (error) {
         console.error('Error cargando publicaciones:', error);
-        container.innerHTML = '<p class="empty">Error al cargar las publicaciones.</p>';
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i>
+            <h3>Error al cargar</h3>
+            <p>${error.message}</p>
+          </div>
+        `;
       }
     }
 
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
+    // ================================================================
+    // 8. ACTUALIZAR ESTADÍSTICAS
+    // ================================================================
+    function updateStats(posts, images, videos, pdfs) {
+      postCount.textContent = posts;
+      imageCount.textContent = images;
+      videoCount.textContent = videos;
+      pdfCount.textContent = pdfs;
     }
 
-    // Cargar al inicio
+    // ================================================================
+    // 9. INICIO
+    // ================================================================
     loadPosts();
   </script>
+
 </body>
+
 </html>

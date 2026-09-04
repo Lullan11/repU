@@ -3,132 +3,801 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Iniciar sesión · Plataforma</title>
+  <title>Iniciar sesión · repU</title>
 
   <!-- Firebase (desde CDN) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
   <style>
-    /* (mismo CSS que antes) */
-    * { margin:0; padding:0; box-sizing:border-box; }
+    /* ============================================================
+       RESET Y BASE
+    ============================================================ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(145deg, #f5f7fa 0%, #e9ecf2 100%);
+      font-family: 'Inter', -apple-system, sans-serif;
       min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
-      padding: 1rem;
+      justify-content: center;
+      padding: 1.5rem;
+      background: #0f0f1a;
+      position: relative;
+      overflow: hidden;
     }
+
+    /* ============================================================
+       FONDO CON EFECTO DE PARTÍCULAS / GRADIENTE DINÁMICO
+    ============================================================ */
+    .bg-gradient {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+      background: 
+        radial-gradient(ellipse at 20% 50%, rgba(192, 57, 43, 0.25) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 50%, rgba(231, 76, 60, 0.20) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 100%, rgba(108, 92, 231, 0.08) 0%, transparent 50%),
+        #0f0f1a;
+    }
+
+    /* Círculos flotantes animados */
+    .bg-circle {
+      position: fixed;
+      border-radius: 50%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.3;
+    }
+
+    .bg-circle:nth-child(1) {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(192, 57, 43, 0.3), transparent 70%);
+      top: -100px;
+      left: -100px;
+      animation: floatCircle 20s ease-in-out infinite;
+    }
+
+    .bg-circle:nth-child(2) {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(231, 76, 60, 0.2), transparent 70%);
+      bottom: -50px;
+      right: -50px;
+      animation: floatCircle 25s ease-in-out infinite reverse;
+    }
+
+    .bg-circle:nth-child(3) {
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(74, 108, 247, 0.15), transparent 70%);
+      top: 40%;
+      right: 10%;
+      animation: floatCircle 18s ease-in-out infinite 3s;
+    }
+
+    @keyframes floatCircle {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -30px) scale(1.1); }
+      66% { transform: translate(-20px, 20px) scale(0.9); }
+    }
+
+    /* ============================================================
+       PARTÍCULAS (mini puntos flotantes)
+    ============================================================ */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: rgba(231, 76, 60, 0.3);
+      border-radius: 50%;
+      animation: floatParticle var(--duration) ease-in-out infinite;
+      animation-delay: var(--delay);
+    }
+
+    @keyframes floatParticle {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+      50% { transform: translateY(-60px) scale(1.5); opacity: 0.8; }
+    }
+
+    /* ============================================================
+       TARJETA DE LOGIN (GLASSMORPHISM)
+    ============================================================ */
     .login-card {
-      background: #ffffff;
-      max-width: 400px;
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      max-width: 420px;
       width: 100%;
-      padding: 2.5rem 2rem;
-      border-radius: 24px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.08), 0 8px 16px rgba(0,0,0,0.06);
-      transition: transform 0.2s ease;
+      padding: 2.8rem 2.2rem;
+      border-radius: 28px;
+      box-shadow: 
+        0 40px 80px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      animation: cardFadeIn 0.8s ease-out;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .login-card:hover { transform: translateY(-4px); }
-    .login-header { text-align: center; margin-bottom: 2rem; }
-    .login-header h1 { font-size: 1.8rem; font-weight: 600; color: #1a2634; }
-    .login-header p { color: #6b7a8a; font-size: 0.95rem; margin-top: 0.3rem; }
-    .form-group { margin-bottom: 1.5rem; }
-    .form-group label { display: block; font-weight: 500; font-size: 0.9rem; color: #2c3e50; margin-bottom: 0.4rem; }
+
+    .login-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 
+        0 50px 100px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    @keyframes cardFadeIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ============================================================
+       HEADER
+    ============================================================ */
+    .login-header {
+      text-align: center;
+      margin-bottom: 2.2rem;
+    }
+
+    .login-header .logo-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .login-header .logo-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #c0392b, #e74c3c);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.8rem;
+      font-weight: 800;
+      box-shadow: 0 8px 24px rgba(231, 76, 60, 0.35);
+      transition: transform 0.3s ease;
+    }
+
+    .login-card:hover .login-header .logo-icon {
+      transform: scale(1.05) rotate(-2deg);
+    }
+
+    .login-header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff, #e2e8f0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+
+    .login-header p {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.95rem;
+      font-weight: 400;
+      margin-top: 0.2rem;
+    }
+
+    /* ============================================================
+       FORMULARIO
+    ============================================================ */
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      font-size: 0.82rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+    }
+
+    .form-group .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-group .input-wrapper .input-icon {
+      position: absolute;
+      left: 14px;
+      color: rgba(255, 255, 255, 0.25);
+      font-size: 1rem;
+      transition: color 0.3s;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .form-group .input-wrapper input:focus ~ .input-icon {
+      color: #e74c3c;
+    }
+
+    /* ============================================================
+       OJO PARA CONTRASEÑA (DENTRO DEL CAMPO)
+    ============================================================ */
+    .toggle-password {
+      position: absolute;
+      right: 14px;
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.25);
+      cursor: pointer;
+      font-size: 1rem;
+      transition: color 0.3s;
+      padding: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toggle-password:hover {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .toggle-password.active {
+      color: #e74c3c;
+    }
+
     .form-group input {
       width: 100%;
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      border: 1.5px solid #dce1e8;
-      border-radius: 12px;
-      background: #fafbfc;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      padding: 0.85rem 3rem 0.85rem 2.8rem;
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      color: #fff;
+      transition: all 0.3s;
       outline: none;
     }
-    .form-group input:focus {
-      border-color: #4a6cf7;
-      box-shadow: 0 0 0 3px rgba(74,108,247,0.15);
-      background: #ffffff;
+
+    .form-group input::placeholder {
+      color: rgba(255, 255, 255, 0.2);
     }
+
+    .form-group input:focus {
+      border-color: #e74c3c;
+      background: rgba(255, 255, 255, 0.07);
+      box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.1);
+    }
+
+    /* ============================================================
+       BOTONES
+    ============================================================ */
     .btn-login {
       width: 100%;
-      padding: 0.8rem;
-      background: #4a6cf7;
-      color: #ffffff;
-      font-weight: 600;
+      padding: 0.9rem;
+      background: linear-gradient(135deg, #c0392b, #e74c3c);
+      color: #fff;
+      font-weight: 700;
       font-size: 1rem;
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       cursor: pointer;
-      transition: background 0.2s, box-shadow 0.2s;
+      transition: all 0.3s;
       margin-top: 0.5rem;
+      box-shadow: 0 4px 20px rgba(231, 76, 60, 0.3);
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
-    .btn-login:hover { background: #3a5bd9; box-shadow: 0 8px 16px rgba(74,108,247,0.25); }
-    .btn-login:active { transform: scale(0.97); }
-    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-    .error-message {
-      background: #fee8e8;
-      color: #b33636;
-      padding: 0.7rem 1rem;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      margin-top: 1rem;
-      display: none;
-      border-left: 4px solid #b33636;
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(231, 76, 60, 0.45);
     }
-    .error-message.show { display: block; }
-    .login-footer { text-align: center; margin-top: 1.8rem; font-size: 0.85rem; color: #8a9aa8; }
-    .login-footer span {
-      display: inline-block;
-      background: #f0f2f5;
-      padding: 0.2rem 0.8rem;
-      border-radius: 20px;
-      font-weight: 500;
-      color: #4a6cf7;
+
+    .btn-login:active {
+      transform: scale(0.97);
     }
-    .spinner {
+
+    .btn-login:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-login .spinner {
       display: none;
       width: 20px;
       height: 20px;
-      border: 3px solid rgba(255,255,255,0.3);
-      border-top-color: #ffffff;
+      border: 2.5px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    .btn-login.loading .spinner {
+      display: inline-block;
+    }
+
+    .btn-login.loading .btn-text {
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ============================================================
+       BOTONES SECUNDARIOS
+    ============================================================ */
+    .btn-link {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.4);
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+      padding: 0.3rem 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-link:hover {
+      color: #e74c3c;
+      text-decoration: underline;
+    }
+
+    .btn-link-light {
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.3s;
+      text-decoration: none;
+    }
+
+    .btn-link-light:hover {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .btn-link-light i {
+      font-size: 0.7rem;
+    }
+
+    /* ============================================================
+       MENSAJES
+    ============================================================ */
+    .error-message {
+      padding: 0.7rem 1rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      margin-top: 1rem;
+      display: none;
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border-left: 3px solid #ef4444;
+      backdrop-filter: blur(4px);
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    /* ============================================================
+       RECUPERACIÓN Y FOOTER
+    ============================================================ */
+    .recovery-section {
+      margin-top: 1.2rem;
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      padding-top: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.2);
+      letter-spacing: 0.5px;
+    }
+
+    /* ============================================================
+       MODAL DE RECUPERACIÓN
+    ============================================================ */
+    .recovery-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(12px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .recovery-modal.active {
+      display: flex;
+    }
+
+    .recovery-modal-content {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      max-width: 420px;
+      width: 100%;
+      padding: 2.2rem;
+      border-radius: 24px;
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+      animation: modalFadeIn 0.4s ease;
+      position: relative;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.95) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .recovery-modal-content .btn-close-modal {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.3);
+      transition: all 0.3s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .recovery-modal-content .btn-close-modal:hover {
+      color: #fff;
+      transform: rotate(90deg);
+    }
+
+    .recovery-modal-content h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.3rem;
+      padding-right: 2rem;
+    }
+
+    .recovery-modal-content p {
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .recovery-modal-content .form-group input {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      padding-left: 1rem;
+    }
+
+    .recovery-modal-content .form-group input:focus {
+      border-color: #e74c3c;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .recovery-modal-content .form-group input::placeholder {
+      color: rgba(255, 255, 255, 0.2);
+    }
+
+    .recovery-modal-content .btn-send {
+      width: 100%;
+      padding: 0.85rem;
+      background: linear-gradient(135deg, #c0392b, #e74c3c);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Inter', sans-serif;
+      box-shadow: 0 4px 20px rgba(231, 76, 60, 0.25);
+    }
+
+    .recovery-modal-content .btn-send:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(231, 76, 60, 0.4);
+    }
+
+    .recovery-modal-content .btn-send:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .recovery-modal-content .btn-send .spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
       margin: 0 auto;
     }
-    .btn-login.loading .spinner { display: inline-block; }
-    .btn-login.loading .btn-text { display: none; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @media (max-width: 480px) { .login-card { padding: 2rem 1.5rem; } }
+
+    .recovery-modal-content .btn-send.loading .spinner {
+      display: inline-block;
+    }
+
+    .recovery-modal-content .btn-send.loading .btn-text {
+      display: none;
+    }
+
+    .recovery-modal-content .btn-back {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-top: 1rem;
+      transition: color 0.3s;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .recovery-modal-content .btn-back:hover {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .recovery-modal-content .recovery-status {
+      margin-top: 1rem;
+      padding: 0.7rem 1rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      display: none;
+    }
+
+    .recovery-modal-content .recovery-status.success {
+      display: block;
+      background: rgba(16, 185, 129, 0.12);
+      color: #34d399;
+      border-left: 3px solid #10b981;
+    }
+
+    .recovery-modal-content .recovery-status.error {
+      display: block;
+      background: rgba(239, 68, 68, 0.12);
+      color: #f87171;
+      border-left: 3px solid #ef4444;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 480px) {
+      .login-card {
+        padding: 2rem 1.5rem;
+        border-radius: 20px;
+      }
+      .login-header h1 {
+        font-size: 1.8rem;
+      }
+      .login-header .logo-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.4rem;
+      }
+      .recovery-modal-content {
+        padding: 1.5rem;
+        margin: 0.5rem;
+        border-radius: 20px;
+      }
+      .recovery-section {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .login-card {
+        padding: 1.5rem 1rem;
+      }
+      .form-group input {
+        padding: 0.7rem 3rem 0.7rem 2.5rem;
+        font-size: 0.85rem;
+      }
+      .toggle-password {
+        right: 10px;
+        font-size: 0.85rem;
+      }
+    }
   </style>
 </head>
 <body>
+
+  <!-- ============================================================
+       FONDO
+  ============================================================ -->
+  <div class="bg-gradient"></div>
+  <div class="bg-circle"></div>
+  <div class="bg-circle"></div>
+  <div class="bg-circle"></div>
+
+  <!-- Partículas -->
+  <div class="particles" id="particles"></div>
+
+  <!-- ============================================================
+       TARJETA DE LOGIN
+  ============================================================ -->
   <div class="login-card">
     <div class="login-header">
-      <h1>RepU Acceso</h1>
-      <p>Inicia sesión con tu cuenta</p>
+      <div class="logo-wrapper">
+        <div class="logo-icon">r</div>
+        <h1>repU</h1>
+      </div>
+      <p>Acceso al panel de administración</p>
     </div>
 
     <form id="loginForm" autocomplete="off">
       <div class="form-group">
         <label for="email">Correo electrónico</label>
-        <input type="email" id="email" placeholder="tucorreo@ejemplo.com" required />
+        <div class="input-wrapper">
+          <input type="email" id="email" placeholder="tucorreo@ejemplo.com" required />
+          <i class="fas fa-envelope input-icon"></i>
+        </div>
       </div>
       <div class="form-group">
         <label for="password">Contraseña</label>
-        <input type="password" id="password" placeholder="••••••••" required />
+        <div class="input-wrapper">
+          <input type="password" id="password" placeholder="••••••••" required />
+          <i class="fas fa-lock input-icon"></i>
+          <button type="button" class="toggle-password" id="togglePassword" aria-label="Mostrar contraseña">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
       </div>
       <button type="submit" class="btn-login" id="loginBtn">
-        <span class="btn-text">Iniciar sesión</span>
+        <span class="btn-text"><i class="fas fa-arrow-right-to-bracket"></i> Iniciar sesión</span>
         <span class="spinner"></span>
       </button>
     </form>
 
     <div id="errorMessage" class="error-message"></div>
-    <div class="login-footer"><span>Panel de administración</span></div>
+
+    <div class="recovery-section">
+      <button class="btn-link" id="forgotPasswordBtn">
+        <i class="fas fa-key"></i> ¿Olvidaste tu contraseña?
+      </button>
+      <a href="index.html" class="btn-link-light">
+        <i class="fas fa-arrow-left"></i> Ir al inicio
+      </a>
+    </div>
+
+    <div class="login-footer">
+      <span>Panel de administración · repU</span>
+    </div>
   </div>
 
+  <!-- ============================================================
+       MODAL DE RECUPERACIÓN
+  ============================================================ -->
+  <div class="recovery-modal" id="recoveryModal">
+    <div class="recovery-modal-content">
+      <button class="btn-close-modal" id="closeModalBtn">✕</button>
+      <h2>🔐 Recuperar contraseña</h2>
+      <p>Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.</p>
+
+      <form id="recoveryForm">
+        <div class="form-group">
+          <label for="recoveryEmail">Correo electrónico</label>
+          <input type="email" id="recoveryEmail" placeholder="tucorreo@ejemplo.com" required />
+        </div>
+        <button type="submit" class="btn-send" id="sendResetBtn">
+          <span class="btn-text"><i class="fas fa-paper-plane"></i> Enviar enlace</span>
+          <span class="spinner"></span>
+        </button>
+      </form>
+
+      <div id="recoveryStatus" class="recovery-status"></div>
+
+      <button class="btn-back" id="backToLoginBtn">
+        <i class="fas fa-arrow-left"></i> Volver al inicio de sesión
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       JAVASCRIPT EXTERNO
+  ============================================================ -->
   <script src="js/login.js"></script>
+
+  <script>
+    // ============================================================
+    // GENERAR PARTÍCULAS (SOLO ESTÉTICA)
+    // ============================================================
+    (function createParticles() {
+      const container = document.getElementById('particles');
+      const count = 40;
+      for (let i = 0; i < count; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        const size = 2 + Math.random() * 4;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.setProperty('--duration', (15 + Math.random() * 25) + 's');
+        particle.style.setProperty('--delay', (Math.random() * 20) + 's');
+        particle.style.opacity = 0.2 + Math.random() * 0.3;
+        container.appendChild(particle);
+      }
+    })();
+
+    // ============================================================
+    // OJO PARA MOSTRAR/OCULTAR CONTRASEÑA
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+      const togglePassword = document.getElementById('togglePassword');
+      const passwordInput = document.getElementById('password');
+      const eyeIcon = togglePassword.querySelector('i');
+
+      togglePassword.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          eyeIcon.className = 'fas fa-eye-slash';
+          togglePassword.classList.add('active');
+          togglePassword.setAttribute('aria-label', 'Ocultar contraseña');
+        } else {
+          passwordInput.type = 'password';
+          eyeIcon.className = 'fas fa-eye';
+          togglePassword.classList.remove('active');
+          togglePassword.setAttribute('aria-label', 'Mostrar contraseña');
+        }
+      });
+    });
+  </script>
 </body>
 </html>

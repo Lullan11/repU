@@ -23,6 +23,16 @@ const loginForm = document.getElementById('loginForm');
 const loginBtn = document.getElementById('loginBtn');
 const errorDiv = document.getElementById('errorMessage');
 
+// Recuperación
+const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+const recoveryModal = document.getElementById('recoveryModal');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const backToLoginBtn = document.getElementById('backToLoginBtn');
+const recoveryForm = document.getElementById('recoveryForm');
+const recoveryEmail = document.getElementById('recoveryEmail');
+const sendResetBtn = document.getElementById('sendResetBtn');
+const recoveryStatus = document.getElementById('recoveryStatus');
+
 // ------------------------------------------------------------------
 // 3. FUNCIONES AUXILIARES
 // ------------------------------------------------------------------
@@ -36,6 +46,18 @@ function showError(message) {
 
 function hideError() {
   errorDiv.classList.remove('show');
+}
+
+function showRecoveryStatus(message, type = 'success') {
+  recoveryStatus.textContent = message;
+  recoveryStatus.className = 'recovery-status ' + type;
+  setTimeout(() => {
+    recoveryStatus.className = 'recovery-status';
+  }, 6000);
+}
+
+function clearRecoveryStatus() {
+  recoveryStatus.className = 'recovery-status';
 }
 
 // ------------------------------------------------------------------
@@ -58,7 +80,6 @@ loginForm.addEventListener('submit', async (e) => {
 
   try {
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
-    // ✅ Redirigir al panel
     window.location.href = 'panel.html';
   } catch (error) {
     let mensaje = 'Error al iniciar sesión. Verifica tus credenciales.';
@@ -92,5 +113,94 @@ loginForm.addEventListener('submit', async (e) => {
 auth.onAuthStateChanged((user) => {
   if (user) {
     window.location.href = 'panel.html';
+  }
+});
+
+// ------------------------------------------------------------------
+// 6. RECUPERACIÓN DE CONTRASEÑA
+// ------------------------------------------------------------------
+
+// Abrir modal
+forgotPasswordBtn.addEventListener('click', () => {
+  recoveryModal.classList.add('active');
+  recoveryEmail.value = emailInput.value || '';
+  clearRecoveryStatus();
+  // Resetear botón
+  sendResetBtn.disabled = false;
+  sendResetBtn.classList.remove('loading');
+  sendResetBtn.querySelector('.btn-text').textContent = 'Enviar enlace';
+});
+
+// Cerrar modal (botón X)
+closeModalBtn.addEventListener('click', () => {
+  recoveryModal.classList.remove('active');
+  clearRecoveryStatus();
+});
+
+// Cerrar modal (botón Volver)
+backToLoginBtn.addEventListener('click', () => {
+  recoveryModal.classList.remove('active');
+  clearRecoveryStatus();
+});
+
+// Cerrar modal al hacer clic fuera del contenido
+recoveryModal.addEventListener('click', (e) => {
+  if (e.target === recoveryModal) {
+    recoveryModal.classList.remove('active');
+    clearRecoveryStatus();
+  }
+});
+
+// Enviar correo de restablecimiento
+recoveryForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearRecoveryStatus();
+
+  const email = recoveryEmail.value.trim();
+
+  if (!email) {
+    showRecoveryStatus('Por favor, ingresa tu correo electrónico.', 'error');
+    return;
+  }
+
+  // Deshabilitar botón
+  sendResetBtn.disabled = true;
+  sendResetBtn.classList.add('loading');
+  sendResetBtn.querySelector('.btn-text').textContent = 'Enviando...';
+
+  try {
+    await auth.sendPasswordResetEmail(email);
+    showRecoveryStatus(
+      '✅ ¡Correo enviado! Revisa tu bandeja de entrada y sigue las instrucciones para restablecer tu contraseña.',
+      'success'
+    );
+    sendResetBtn.querySelector('.btn-text').textContent = '✅ Enviado';
+  } catch (error) {
+    let mensaje = 'Error al enviar el correo.';
+    switch (error.code) {
+      case 'auth/user-not-found':
+        mensaje = 'No existe una cuenta con este correo.';
+        break;
+      case 'auth/invalid-email':
+        mensaje = 'El correo no es válido.';
+        break;
+      case 'auth/too-many-requests':
+        mensaje = 'Demasiados intentos. Intenta más tarde.';
+        break;
+      default:
+        mensaje = error.message || mensaje;
+    }
+    showRecoveryStatus('❌ ' + mensaje, 'error');
+    sendResetBtn.disabled = false;
+    sendResetBtn.classList.remove('loading');
+    sendResetBtn.querySelector('.btn-text').textContent = 'Enviar enlace';
+  }
+});
+
+// Permitir cerrar modal con ESC
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && recoveryModal.classList.contains('active')) {
+    recoveryModal.classList.remove('active');
+    clearRecoveryStatus();
   }
 });

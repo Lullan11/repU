@@ -4,15 +4,23 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Panel de administración</title>
+    <title>repU · Panel de administración</title>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
     <style>
-        /* ----- Reset y estilos globales ----- */
+        /* ============================================================
+           RESET Y BASE
+        ============================================================ */
         * {
             margin: 0;
             padding: 0;
@@ -20,73 +28,86 @@
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            font-family: 'Inter', -apple-system, sans-serif;
             min-height: 100vh;
-            padding: 2rem 1.5rem;
-            color: #1e293b;
+            padding: 1.5rem;
+            background: #f0f2f5;
+            color: #1a1a2e;
+        }
+
+        ::selection {
+            background: #e74c3c;
+            color: #fff;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 2.5rem;
-            border-radius: 32px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            transition: box-shadow 0.3s ease;
         }
 
-        .container:hover {
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.10);
-        }
-
-        /* Encabezado */
+        /* ============================================================
+           HEADER
+        ============================================================ */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
-            margin-bottom: 2.5rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 2px solid rgba(0, 0, 0, 0.04);
+            margin-bottom: 2rem;
+            padding: 1.2rem 2rem;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-left .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 800;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
         }
 
         .header-left h1 {
-            font-size: 2.2rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #4a6cf7, #6a3de8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.5px;
+            color: #1a1a2e;
         }
 
         .header-left .subtitle {
-            font-size: 1rem;
-            color: #64748b;
-            margin-top: 0.2rem;
+            font-size: 0.8rem;
+            color: #6b7280;
         }
 
         .header-right {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            gap: 1rem;
             flex-wrap: wrap;
         }
 
         .welcome-badge {
-            background: linear-gradient(135deg, #4a6cf7, #6a3de8);
-            color: #fff;
-            padding: 0.5rem 1.2rem;
+            background: #fef2f2;
+            color: #991b1b;
+            padding: 0.4rem 1.2rem;
             border-radius: 40px;
             font-weight: 500;
-            font-size: 0.95rem;
-            box-shadow: 0 4px 12px rgba(74, 108, 247, 0.25);
+            font-size: 0.85rem;
+            border: 1px solid #fecaca;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
@@ -94,136 +115,903 @@
 
         .btn-logout {
             background: transparent;
-            border: 1.5px solid #e2e8f0;
+            border: 1.5px solid #e5e7eb;
             padding: 0.5rem 1.4rem;
             border-radius: 40px;
             font-weight: 600;
-            color: #1e293b;
+            color: #4b5563;
             cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 0.9rem;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
         }
 
         .btn-logout:hover {
-            background: #fee2e2;
-            border-color: #f87171;
-            color: #b91c1c;
+            background: #fef2f2;
+            border-color: #fca5a5;
+            color: #991b1b;
         }
 
-        /* Tarjetas de sección */
-        .section-card {
+        /* ============================================================
+           DASHBOARD
+        ============================================================ */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
             background: #ffffff;
-            border-radius: 24px;
+            border-radius: 16px;
+            padding: 1.2rem 1.5rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .stat-card .stat-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.85rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .stat-card.stat-posts .stat-icon {
+            color: #e74c3c;
+        }
+        .stat-card.stat-users .stat-icon {
+            color: #3b82f6;
+        }
+
+        /* ============================================================
+           NAVEGACIÓN
+        ============================================================ */
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .nav-buttons .btn-nav {
+            padding: 0.7rem 2rem;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            background: #ffffff;
+            color: #4b5563;
+            border: 1.5px solid #e5e7eb;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .nav-buttons .btn-nav:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+
+        .nav-buttons .btn-nav.active {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            color: #fff;
+            border-color: #e74c3c;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+        }
+
+        .nav-buttons .btn-nav.btn-users.active {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        /* ============================================================
+           SECCIÓN PUBLICACIONES
+        ============================================================ */
+        .section-posts {
+            background: #ffffff;
+            border-radius: 20px;
             padding: 2rem;
-            margin-bottom: 2.5rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            display: block;
         }
 
-        .section-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+        .section-posts.hidden {
+            display: none;
         }
 
-        .section-title {
-            font-size: 1.6rem;
+        .section-posts .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .section-posts .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .section-posts .section-title .badge {
+            background: #fef2f2;
+            color: #991b1b;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.1rem 0.7rem;
+            border-radius: 30px;
+        }
+
+        .section-posts .btn-toggle-form {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: color 0.3s;
+        }
+
+        .section-posts .btn-toggle-form:hover {
+            color: #c0392b;
+        }
+
+        .section-posts .post-form-container {
+            display: none;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: #f9fafb;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .section-posts .post-form-container.active {
+            display: block;
+        }
+
+        /* ============================================================
+           POSTS - GALERÍA DE TARJETAS (MÁS GRANDE)
+        ============================================================ */
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            max-height: 580px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .posts-grid::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .posts-grid::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 8px;
+        }
+
+        .posts-grid::-webkit-scrollbar-thumb {
+            background: #e74c3c;
+            border-radius: 8px;
+        }
+
+        /* ========== TARJETA DE PUBLICACIÓN ========== */
+        .post-card {
+            background: #f9fafb;
+            border-radius: 14px;
+            overflow: hidden;
+            transition: all 0.3s;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .post-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            border-color: #d1d5db;
+        }
+
+        /* Imagen destacada - MÁS GRANDE */
+        .post-card .post-image {
+            width: 100%;
+            height: 180px;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .post-card .post-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .post-card .post-image .no-image {
+            color: #9ca3af;
+            font-size: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .post-card .post-image .no-image i {
+            font-size: 2.5rem;
+            opacity: 0.4;
+        }
+        .post-card .post-image .no-image span {
+            font-size: 0.7rem;
+            opacity: 0.5;
+        }
+
+        /* Badge de archivos */
+        .post-card .post-image .file-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1.8rem;
-            color: #0f172a;
+            gap: 0.4rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
-        .section-title .emoji {
+        .post-card .post-image .file-badge i {
+            font-size: 0.8rem;
+        }
+
+        .post-card .post-image .file-badge.has-files {
+            background: rgba(231, 76, 60, 0.85);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .post-card .post-image .file-badge.no-files {
+            background: rgba(107, 114, 128, 0.7);
+        }
+
+        /* Contenido */
+        .post-card .post-body {
+            padding: 1rem 1.2rem 0.6rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .post-card .post-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .post-card .post-text {
+            font-size: 0.85rem;
+            color: #4b5563;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .post-card .post-meta {
+            font-size: 0.65rem;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-top: 0.2rem;
+        }
+
+        .post-card .post-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1.2rem 0.7rem;
+            border-top: 1px solid #e5e7eb;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .post-card .post-footer .post-actions {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .post-card .post-footer .post-actions .btn {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.9rem;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+
+        .post-card .post-footer .post-actions .btn-view {
+            background: #4a6cf7;
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 0.25rem 0.9rem;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-weight: 600;
+        }
+
+        .post-card .post-footer .post-actions .btn-view:hover {
+            background: #3a5bd9;
+            transform: scale(1.05);
+        }
+
+        .post-card .post-footer .post-actions .btn-primary {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.9rem;
+        }
+
+        .post-card .post-footer .post-actions .btn-danger {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.9rem;
+        }
+
+        .post-card .post-footer .post-files {
+            display: flex;
+            gap: 0.3rem;
+            align-items: center;
+        }
+
+        .post-card .post-footer .post-files .file-icon {
+            color: #6b7280;
+            font-size: 0.7rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            padding: 0.1rem 0.4rem;
+            background: #f3f4f6;
+            border-radius: 4px;
+        }
+
+        .post-card .post-footer .post-files img {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .post-card .post-footer .post-files .more-files {
+            font-size: 0.6rem;
+            color: #9ca3af;
+            font-weight: 600;
+        }
+
+        /* ============================================================
+           MODAL DE PUBLICACIÓN COMPLETA
+        ============================================================ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            border-radius: 24px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-content .close-modal {
+            position: sticky;
+            top: 0;
+            float: right;
+            background: #f3f4f6;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            z-index: 10;
+        }
+
+        .modal-content .close-modal:hover {
+            background: #e5e7eb;
+            color: #1a1a2e;
+            transform: rotate(90deg);
+        }
+
+        .modal-content .modal-title {
             font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-top: 0.2rem;
+            margin-bottom: 0.3rem;
+            padding-right: 3rem;
         }
 
-        /* Formularios */
-        .form-group {
+        .modal-content .modal-date {
+            font-size: 0.8rem;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-content .modal-body {
+            color: #374151;
+            font-size: 1rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-word;
             margin-bottom: 1.5rem;
+        }
+
+        .modal-content .modal-files {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .modal-content .modal-files .file-item {
+            background: #f8f9fc;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #f1f2f6;
+            transition: border 0.2s;
+        }
+
+        .modal-content .modal-files .file-item:hover {
+            border-color: #d1d5db;
+        }
+
+        .modal-content .modal-files .file-item .file-preview img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            display: block;
+            background: #f1f2f6;
+            cursor: pointer;
+        }
+
+        .modal-content .modal-files .file-item .file-preview video {
+            width: 100%;
+            max-height: 400px;
+            display: block;
+            background: #000;
+        }
+
+        .modal-content .modal-files .file-item .file-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0.8rem;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            background: #f8f9fc;
+        }
+
+        .modal-content .modal-files .file-item .file-info .file-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .modal-content .modal-files .file-item .file-info .file-actions {
+            display: flex;
+            gap: 0.3rem;
+        }
+
+        .modal-content .modal-files .file-item .file-info .file-actions a,
+        .modal-content .modal-files .file-item .file-info .file-actions button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            padding: 0.15rem 0.6rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 0.7rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .modal-content .modal-files .file-item .file-info .file-actions .btn-download {
+            background: #e74c3c;
+            color: #fff;
+        }
+
+        .modal-content .modal-files .file-item .file-info .file-actions .btn-download:hover {
+            background: #c0392b;
+            transform: scale(1.02);
+        }
+
+        .modal-content .modal-files .file-item .file-info .file-actions .btn-view {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .modal-content .modal-files .file-item .file-info .file-actions .btn-view:hover {
+            background: #d1d5db;
+        }
+
+        .modal-content .modal-files .file-item .file-info .file-actions .btn-downloading {
+            background: #f39c12;
+            color: #fff;
+            cursor: wait;
+            opacity: 0.7;
+        }
+
+        .modal-content .modal-files .file-item .file-info .file-actions .btn-downloading:hover {
+            transform: none;
+        }
+
+        /* ============================================================
+           SECCIÓN USUARIOS
+        ============================================================ */
+        .section-users {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            display: none;
+        }
+
+        .section-users.active {
+            display: block;
+        }
+
+        .section-users .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .section-users .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .section-users .section-title .badge {
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.1rem 0.7rem;
+            border-radius: 30px;
+        }
+
+        .section-users .btn-toggle-form {
+            background: none;
+            border: none;
+            color: #3b82f6;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: color 0.3s;
+        }
+
+        .section-users .btn-toggle-form:hover {
+            color: #2563eb;
+        }
+
+        .section-users .user-form-container {
+            display: none;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: #f9fafb;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .section-users .user-form-container.active {
+            display: block;
+        }
+
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 0.6rem;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            background: #f9fafb;
+            padding: 0.4rem 0.8rem;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s;
+        }
+
+        .user-item:hover {
+            background: #ffffff;
+            border-color: #d1d5db;
+        }
+
+        .user-item .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-item .user-avatar {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .user-item .user-email {
+            font-weight: 500;
+            color: #1a1a2e;
+            font-size: 0.8rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .user-item .user-badge {
+            background: #fef2f2;
+            color: #991b1b;
+            padding: 0.05rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.5rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .user-item .user-actions {
+            display: flex;
+            gap: 0.2rem;
+            flex-shrink: 0;
+        }
+
+        .user-item .user-actions .btn {
+            font-size: 0.55rem;
+            padding: 0.1rem 0.5rem;
+        }
+
+        .user-item .user-actions .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* ============================================================
+           FORMULARIOS
+        ============================================================ */
+        .form-group {
+            margin-bottom: 1rem;
         }
 
         .form-group label {
             display: block;
             font-weight: 500;
-            margin-bottom: 0.4rem;
-            color: #334155;
-            font-size: 0.95rem;
+            margin-bottom: 0.3rem;
+            color: #4b5563;
+            font-size: 0.85rem;
+        }
+
+        .form-group label i {
+            color: #e74c3c;
+            width: 1.2rem;
         }
 
         .form-group input,
         .form-group textarea {
             width: 100%;
-            padding: 0.8rem 1rem;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 14px;
-            font-size: 1rem;
-            background: #f8fafc;
-            transition: border 0.2s, box-shadow 0.2s;
-            font-family: inherit;
+            padding: 0.7rem 1rem;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            background: #ffffff;
+            color: #1a1a2e;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            outline: none;
         }
 
         .form-group input:focus,
         .form-group textarea:focus {
-            border-color: #4a6cf7;
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(74, 108, 247, 0.10);
-            background: #ffffff;
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.08);
         }
 
         .form-group textarea {
-            min-height: 120px;
+            min-height: 80px;
             resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
         }
 
         .file-input-wrapper {
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.8rem;
             align-items: center;
         }
 
         .file-input-wrapper input[type="file"] {
             flex: 1;
-            padding: 0.6rem;
-            border: 2px dashed #cbd5e1;
-            border-radius: 14px;
-            background: #f8fafc;
+            padding: 0.5rem;
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            background: #ffffff;
             cursor: pointer;
-            transition: border 0.2s;
+            transition: border 0.3s;
+            color: #4b5563;
+            font-size: 0.85rem;
         }
 
         .file-input-wrapper input[type="file"]:hover {
-            border-color: #4a6cf7;
+            border-color: #e74c3c;
+        }
+
+        .file-input-wrapper input[type="file"]::file-selector-button {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .file-input-wrapper input[type="file"]::file-selector-button:hover {
+            background: #fecaca;
         }
 
         .file-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.6rem;
-            margin: 0.8rem 0;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
         }
 
         .file-tag {
-            background: #eef2ff;
-            padding: 0.3rem 1rem;
+            background: #f3f4f6;
+            padding: 0.2rem 0.8rem;
             border-radius: 30px;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            color: #1e293b;
-            border: 1px solid #c7d2fe;
+            gap: 0.4rem;
+            color: #1a1a2e;
+            border: 1px solid #e5e7eb;
         }
 
         .file-tag .remove {
             cursor: pointer;
             color: #ef4444;
             font-weight: 700;
-            font-size: 1.1rem;
-            line-height: 1;
+            font-size: 0.9rem;
             transition: transform 0.2s;
         }
 
@@ -231,216 +1019,119 @@
             transform: scale(1.2);
         }
 
-        .form-actions {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
+        .file-tag.pending {
+            border-color: #f59e0b;
+            background: #fef3c7;
+            color: #92400e;
         }
 
-        /* Botones */
+        .file-tag.uploaded {
+            border-color: #10b981;
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* ============================================================
+           BOTONES
+        ============================================================ */
         .btn {
-            padding: 0.7rem 1.8rem;
+            padding: 0.6rem 1.6rem;
             border: none;
             border-radius: 40px;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s;
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
+            font-family: 'Inter', sans-serif;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #4a6cf7, #6a3de8);
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
             color: #fff;
-            box-shadow: 0 4px 14px rgba(74, 108, 247, 0.25);
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(74, 108, 247, 0.35);
+            box-shadow: 0 8px 24px rgba(231, 76, 60, 0.3);
         }
 
         .btn-success {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #059669, #10b981);
             color: #fff;
-            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
         }
 
         .btn-success:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
+            background: linear-gradient(135deg, #dc2626, #ef4444);
             color: #fff;
-            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.2);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
         }
 
         .btn-danger:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.25);
         }
 
         .btn-outline {
             background: transparent;
-            border: 1.5px solid #e2e8f0;
-            color: #1e293b;
+            border: 1.5px solid #e5e7eb;
+            color: #4b5563;
         }
 
         .btn-outline:hover {
-            background: #f1f5f9;
-            border-color: #94a3b8;
+            background: #f9fafb;
+            border-color: #9ca3af;
         }
 
         .btn-sm {
-            padding: 0.35rem 1rem;
-            font-size: 0.8rem;
-        }
-
-        /* Listado de publicaciones */
-        .post-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .post-item {
-            background: #f8fafc;
-            padding: 1.5rem;
-            border-radius: 20px;
-            border-left: 6px solid #4a6cf7;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-            transition: all 0.2s ease;
-        }
-
-        .post-item:hover {
-            background: #ffffff;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
-        }
-
-        .post-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .post-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #0f172a;
-        }
-
-        .post-meta {
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-
-        .post-body {
-            color: #334155;
-            white-space: pre-wrap;
-            word-break: break-word;
-            margin: 0.5rem 0 0.8rem 0;
-            line-height: 1.6;
-        }
-
-        .post-files {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-            margin-bottom: 0.8rem;
-        }
-
-        .post-files a {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            padding: 0.2rem 0.9rem;
-            background: #e9ecf2;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.7rem;
             border-radius: 30px;
-            text-decoration: none;
-            color: #1e293b;
-            font-size: 0.85rem;
-            transition: background 0.2s;
         }
 
-        .post-files a:hover {
-            background: #d5dce6;
-        }
-
-        .post-actions {
+        .form-actions {
             display: flex;
-            gap: 0.6rem;
+            gap: 0.8rem;
             flex-wrap: wrap;
-            margin-top: 0.5rem;
+            margin-top: 0.8rem;
         }
 
         .empty {
-            color: #94a3b8;
+            color: #6b7280;
             font-style: italic;
-            padding: 1rem 0;
+            padding: 0.8rem 0;
             text-align: center;
+            grid-column: 1 / -1;
         }
 
-        /* Usuarios */
-        .user-form {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.2rem;
-            align-items: flex-end;
-            background: #f8fafc;
-            padding: 1.5rem;
-            border-radius: 20px;
-        }
-
-        .user-form .form-group {
-            flex: 1 1 180px;
-            margin-bottom: 0;
-        }
-
-        .user-form .form-actions {
-            margin-top: 0;
-        }
-
-        .user-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            margin-top: 1.2rem;
-        }
-
-        .user-tag {
-            background: #eef2ff;
-            padding: 0.3rem 1.2rem;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            border: 1px solid #c7d2fe;
-            color: #1e293b;
-        }
-
-        /* Toast */
+        /* ============================================================
+           TOAST
+        ============================================================ */
         .toast {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
-            background: #1e293b;
+            background: #1f2937;
             color: #fff;
-            padding: 0.8rem 1.8rem;
+            padding: 0.6rem 1.6rem;
             border-radius: 40px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
             opacity: 0;
             transform: translateY(20px) scale(0.95);
-            transition: opacity 0.3s, transform 0.3s;
+            transition: all 0.3s;
             pointer-events: none;
             z-index: 999;
             font-weight: 500;
-            backdrop-filter: blur(8px);
+            font-size: 0.9rem;
         }
 
         .toast.show {
@@ -449,152 +1140,542 @@
         }
 
         .toast.success {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: #065f46;
         }
-
         .toast.error {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
+            background: #991b1b;
         }
 
-        /* Responsive */
+        /* ============================================================
+           RESPONSIVE
+        ============================================================ */
+        /* Tablet */
+        @media (max-width: 1024px) {
+            .posts-grid {
+                grid-template-columns: repeat(2, 1fr);
+                max-height: 500px;
+            }
+
+            .post-card .post-image {
+                height: 150px;
+            }
+        }
+
+        /* Móvil */
         @media (max-width: 768px) {
-            .container {
-                padding: 1.5rem;
+            body {
+                padding: 1rem;
             }
 
             .header {
                 flex-direction: column;
                 align-items: stretch;
                 gap: 0.8rem;
+                padding: 1rem;
+            }
+
+            .header-left {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-left h1 {
+                font-size: 1.2rem;
             }
 
             .header-right {
                 justify-content: space-between;
             }
 
-            .section-card {
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.8rem;
+            }
+
+            .stat-card {
+                padding: 0.8rem 1rem;
+            }
+
+            .stat-card .stat-number {
+                font-size: 1.8rem;
+            }
+
+            .section-posts,
+            .section-users {
                 padding: 1.2rem;
             }
 
-            .user-form {
+            .posts-grid {
+                grid-template-columns: 1fr;
+                /* 🔥 UNA COLUMNA EN MÓVIL */
+                max-height: 450px;
+                gap: 1rem;
+            }
+
+            .post-card .post-image {
+                height: 140px;
+            }
+
+            .users-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-buttons .btn-nav {
+                flex: none;
+                width: 100%;
+            }
+
+            .modal-content {
+                padding: 1.2rem;
+                margin: 1rem;
+            }
+
+            .modal-content .modal-title {
+                font-size: 1.3rem;
+                padding-right: 2.5rem;
+            }
+        }
+
+        /* Móvil pequeño */
+        @media (max-width: 480px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .section-posts,
+            .section-users {
+                padding: 1rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem;
+            }
+
+            .stat-card {
+                padding: 0.6rem 0.8rem;
+            }
+
+            .stat-card .stat-number {
+                font-size: 1.5rem;
+            }
+
+            .header-left h1 {
+                font-size: 1rem;
+            }
+
+            .welcome-badge {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.6rem;
+            }
+
+            .btn-logout {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.8rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .file-input-wrapper {
                 flex-direction: column;
                 align-items: stretch;
             }
 
-            .user-form .form-group {
-                flex: 1 1 auto;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 1rem 0.5rem;
+            .posts-grid {
+                max-height: 350px;
+                gap: 0.8rem;
             }
 
-            .container {
+            .post-card .post-image {
+                height: 120px;
+            }
+
+            .post-card .post-body {
+                padding: 0.6rem 0.8rem 0.4rem;
+            }
+
+            .post-card .post-title {
+                font-size: 0.85rem;
+            }
+
+            .post-card .post-text {
+                font-size: 0.75rem;
+                -webkit-line-clamp: 1;
+            }
+
+            .post-card .post-footer {
+                padding: 0.3rem 0.8rem 0.5rem;
+            }
+
+            .modal-content {
                 padding: 1rem;
-                border-radius: 20px;
-            }
-
-            .section-title {
-                font-size: 1.3rem;
+                margin: 0.5rem;
+                border-radius: 16px;
             }
         }
     </style>
 </head>
 
 <body>
+
     <div class="container">
-        <!-- Encabezado -->
-        <div class="header">
+
+        <!-- HEADER -->
+        <header class="header">
             <div class="header-left">
-                <h1>📋 Panel de administración</h1>
-                <div class="subtitle">Gestiona tus publicaciones y usuarios</div>
+                <div class="logo-icon">r</div>
+                <div>
+                    <h1>Panel de administración</h1>
+                    <div class="subtitle">Gestiona publicaciones y usuarios · repU</div>
+                </div>
             </div>
             <div class="header-right">
-                <span class="welcome-badge" id="welcomeMessage">👋 Bienvenido, Usuario</span>
-                <button class="btn-logout" id="logoutBtn">Cerrar sesión</button>
+                <span class="welcome-badge" id="welcomeMessage">
+                    <i class="fas fa-user-circle"></i> 👋 Bienvenido, Usuario
+                </span>
+                <button class="btn-logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                </button>
+            </div>
+        </header>
+
+        <!-- DASHBOARD -->
+        <div class="dashboard-grid">
+            <div class="stat-card stat-posts">
+                <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+                <div class="stat-number" id="statPosts">0</div>
+                <div class="stat-label">Publicaciones</div>
+            </div>
+            <div class="stat-card stat-users">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div class="stat-number" id="statUsers">0</div>
+                <div class="stat-label">Usuarios</div>
             </div>
         </div>
 
-        <!-- SECCIÓN: CREAR/EDITAR PUBLICACIÓN -->
-        <div class="section-card">
-            <div class="section-title">
-                <span class="emoji">✏️</span>
-                <span id="formTitle">Nueva publicación</span>
+        <!-- NAVEGACIÓN -->
+        <div class="nav-buttons">
+            <button class="btn-nav active" id="navPosts" data-section="posts">
+                <i class="fas fa-newspaper"></i> Publicaciones
+            </button>
+            <button class="btn-nav btn-users" id="navUsers" data-section="users">
+                <i class="fas fa-users"></i> Usuarios
+            </button>
+        </div>
+
+        <!-- ============================================================
+           SECCIÓN PUBLICACIONES
+        ============================================================ -->
+        <section class="section-posts" id="sectionPosts">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-newspaper" style="color:#e74c3c;"></i>
+                    Publicaciones
+                    <span class="badge" id="postsCount">0</span>
+                </div>
+                <button class="btn-toggle-form" id="togglePostForm">
+                    <i class="fas fa-plus-circle"></i> Nueva publicación
+                </button>
             </div>
-            <form id="postForm">
-                <input type="hidden" id="postId" value="" />
 
-                <div class="form-group">
-                    <label for="postTitle">Título</label>
-                    <input type="text" id="postTitle" placeholder="Ej: Mi primer post" required />
-                </div>
-
-                <div class="form-group">
-                    <label for="postText">Contenido</label>
-                    <textarea id="postText" placeholder="Escribe el contenido de tu publicación..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Archivos adjuntos</label>
-                    <div class="file-input-wrapper">
-                        <input type="file" id="fileInput" multiple accept="image/*,video/*,.pdf" />
-                        <button type="button" class="btn btn-primary btn-sm" id="uploadFilesBtn">⬆️ Subir
-                            archivos</button>
+            <!-- Formulario -->
+            <div class="post-form-container" id="postFormContainer">
+                <form id="postForm">
+                    <input type="hidden" id="postId" value="" />
+                    <div class="form-group">
+                        <label for="postTitle"><i class="fas fa-heading"></i> Título</label>
+                        <input type="text" id="postTitle" placeholder="Ej: Mi primer post" required />
                     </div>
-                    <div id="fileList" class="file-list"></div>
-                    <small style="color:#64748b;">Puedes seleccionar varios archivos. Se subirán a Cloudinary.</small>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" id="savePostBtn">💾 Guardar publicación</button>
-                    <button type="button" class="btn btn-outline" id="cancelEditBtn" style="display:none;">↩️ Cancelar
-                        edición</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- SECCIÓN: LISTADO DE PUBLICACIONES -->
-        <div class="section-card">
-            <div class="section-title">
-                <span class="emoji">📄</span>
-                Publicaciones existentes
+                    <div class="form-group">
+                        <label for="postText"><i class="fas fa-align-left"></i> Contenido</label>
+                        <textarea id="postText" placeholder="Escribe el contenido de tu publicación..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-paperclip"></i> Archivos adjuntos</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="fileInput" multiple
+                                accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" />
+                            <button type="button" class="btn btn-primary btn-sm" id="uploadFilesBtn">
+                                <i class="fas fa-upload"></i> Subir archivos
+                            </button>
+                        </div>
+                        <div id="fileList" class="file-list"></div>
+                        <small style="color:#6b7280; font-size:0.7rem;">
+                            <i class="fas fa-info-circle"></i> Puedes seleccionar varios archivos
+                        </small>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="savePostBtn">
+                            <i class="fas fa-save"></i> Guardar publicación
+                        </button>
+                        <button type="button" class="btn btn-outline" id="cancelEditBtn" style="display:none;">
+                            <i class="fas fa-times"></i> Cancelar edición
+                        </button>
+                    </div>
+                </form>
             </div>
-            <div id="postsContainer" class="post-list">
-                <p class="empty">Cargando publicaciones...</p>
-            </div>
-        </div>
 
-        <!-- SECCIÓN: CREAR USUARIOS -->
-        <div class="section-card">
-            <div class="section-title">
-                <span class="emoji">👤</span>
-                Crear nuevo usuario
+            <!-- Listado en GALERÍA -->
+            <div id="postsContainer" class="posts-grid">
+                <p class="empty"><i class="fas fa-spinner fa-spin"></i> Cargando publicaciones...</p>
             </div>
-            <form id="userForm" class="user-form">
-                <div class="form-group">
-                    <label for="userEmail">Correo electrónico</label>
-                    <input type="email" id="userEmail" placeholder="nuevo@ejemplo.com" required />
+        </section>
+
+        <!-- ============================================================
+           SECCIÓN USUARIOS
+        ============================================================ -->
+        <section class="section-users" id="sectionUsers">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-users" style="color:#3b82f6;"></i>
+                    Usuarios
+                    <span class="badge" id="usersCount">0</span>
                 </div>
-                <div class="form-group">
-                    <label for="userPassword">Contraseña</label>
-                    <input type="password" id="userPassword" placeholder="Mínimo 6 caracteres" required minlength="6" />
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-success">➕ Crear usuario</button>
-                </div>
-            </form>
-            <div id="userList" class="user-list">
+                <button class="btn-toggle-form" id="toggleUserForm">
+                    <i class="fas fa-user-plus"></i> Nuevo usuario
+                </button>
+            </div>
+
+            <div class="user-form-container" id="userFormContainer">
+                <form id="userForm" class="user-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="userEmail"><i class="fas fa-envelope"></i> Correo electrónico</label>
+                            <input type="email" id="userEmail" placeholder="nuevo@ejemplo.com" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="userPassword"><i class="fas fa-lock"></i> Contraseña</label>
+                            <input type="password" id="userPassword" placeholder="Mínimo 6 caracteres" required minlength="6" />
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-user-plus"></i> Crear usuario
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="userList" class="users-grid">
                 <span class="empty">No hay usuarios adicionales.</span>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ============================================================
+       MODAL DE PUBLICACIÓN COMPLETA
+    ============================================================ -->
+    <div class="modal-overlay" id="postModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closePostModal()">✕</button>
+            <div id="modalContent">
+                <!-- El contenido se inyecta aquí desde JavaScript -->
             </div>
         </div>
     </div>
 
-    <!-- Toast -->
+    <!-- TOAST -->
     <div id="toast" class="toast"></div>
 
+    <!-- JS EXTERNO -->
     <script src="js/panel.js"></script>
+
+    <script>
+        // NAVEGACIÓN
+        const navPosts = document.getElementById('navPosts');
+        const navUsers = document.getElementById('navUsers');
+        const sectionPosts = document.getElementById('sectionPosts');
+        const sectionUsers = document.getElementById('sectionUsers');
+
+        function showSection(section) {
+            sectionPosts.style.display = 'none';
+            sectionUsers.style.display = 'none';
+            navPosts.classList.remove('active');
+            navUsers.classList.remove('active');
+
+            if (section === 'posts') {
+                sectionPosts.style.display = 'block';
+                navPosts.classList.add('active');
+            } else if (section === 'users') {
+                sectionUsers.style.display = 'block';
+                sectionUsers.classList.add('active');
+                navUsers.classList.add('active');
+            }
+        }
+
+        navPosts.addEventListener('click', () => showSection('posts'));
+        navUsers.addEventListener('click', () => showSection('users'));
+
+        // TOGGLE FORMULARIOS
+        document.getElementById('togglePostForm').addEventListener('click', function() {
+            const container = document.getElementById('postFormContainer');
+            container.classList.toggle('active');
+            this.innerHTML = container.classList.contains('active') ?
+                '<i class="fas fa-times-circle"></i> Cerrar formulario' :
+                '<i class="fas fa-plus-circle"></i> Nueva publicación';
+        });
+
+        document.getElementById('toggleUserForm').addEventListener('click', function() {
+            const container = document.getElementById('userFormContainer');
+            container.classList.toggle('active');
+            this.innerHTML = container.classList.contains('active') ?
+                '<i class="fas fa-times-circle"></i> Cerrar formulario' :
+                '<i class="fas fa-user-plus"></i> Nuevo usuario';
+        });
+
+        document.addEventListener('editPostTriggered', function() {
+            const container = document.getElementById('postFormContainer');
+            const btn = document.getElementById('togglePostForm');
+            if (!container.classList.contains('active')) {
+                container.classList.add('active');
+                btn.innerHTML = '<i class="fas fa-times-circle"></i> Cerrar formulario';
+            }
+            showSection('posts');
+        });
+
+        // MODAL
+        function openPostModal(postId) {
+            const postCard = document.querySelector(`.post-card[data-id="${postId}"]`);
+            if (!postCard) return;
+
+            const postData = JSON.parse(postCard.dataset.postData);
+            if (!postData) return;
+
+            const modal = document.getElementById('postModal');
+            const content = document.getElementById('modalContent');
+
+            const dateInfo = formatModalDate(postData.createdAt);
+            const dateStr = dateInfo.date + ' · ' + dateInfo.time;
+
+            let filesHtml = '';
+            const files = postData.archivos || [];
+
+            if (files.length > 0) {
+                files.forEach(f => {
+                    const fileUrl = f.url || '';
+                    const fileName = f.name || 'archivo';
+                    const fileType = f.type || '';
+                    const isPdf = fileType === 'application/pdf' || fileName.toLowerCase().endsWith('.pdf');
+
+                    let previewHtml = '';
+                    if (fileType.startsWith('image/')) {
+                        previewHtml = `
+                            <div class="file-preview">
+                                <img src="${fileUrl}" alt="${fileName}" loading="lazy" style="max-height:400px; object-fit:contain; cursor:pointer;" onclick="window.open('${fileUrl}', '_blank')" />
+                            </div>
+                        `;
+                    } else if (fileType.startsWith('video/')) {
+                        previewHtml = `
+                            <div class="file-preview">
+                                <video controls style="max-height:400px; width:100%;"><source src="${fileUrl}" type="${fileType}"></video>
+                            </div>
+                        `;
+                    }
+
+                    let actionsHtml = '';
+                    if (isPdf) {
+                        actionsHtml = `
+                            <a href="${fileUrl}" target="_blank" class="btn-view"><i class="fas fa-eye"></i> Ver PDF</a>
+                            <a href="${fileUrl}" download="${fileName}" class="btn-download" target="_blank"><i class="fas fa-download"></i> Descargar</a>
+                        `;
+                    } else if (fileType.startsWith('image/')) {
+                        actionsHtml = `
+                            <a href="${fileUrl}" download="${fileName}" class="btn-download" target="_blank"><i class="fas fa-download"></i> Descargar</a>
+                        `;
+                    } else if (fileType.startsWith('video/')) {
+                        actionsHtml = `
+                            <a href="${fileUrl}" download="${fileName}" class="btn-download" target="_blank"><i class="fas fa-download"></i> Descargar</a>
+                        `;
+                    } else {
+                        actionsHtml = `
+                            <a href="${fileUrl}" target="_blank" class="btn-view"><i class="fas fa-eye"></i> Ver</a>
+                            <a href="${fileUrl}" download="${fileName}" class="btn-download" target="_blank"><i class="fas fa-download"></i> Descargar</a>
+                        `;
+                    }
+
+                    filesHtml += `
+                        <div class="file-item">
+                            ${previewHtml}
+                            <div class="file-info">
+                                <span class="file-name">
+                                    <i class="fas ${fileType.startsWith('image/') ? 'fa-image' : fileType.startsWith('video/') ? 'fa-video' : isPdf ? 'fa-file-pdf' : 'fa-file'}"></i>
+                                    ${fileName}
+                                </span>
+                                <div class="file-actions">
+                                    ${actionsHtml}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            content.innerHTML = `
+                <h2 class="modal-title">${escapeHtml(postData.titulo || 'Sin título')}</h2>
+                <div class="modal-date"><i class="far fa-clock"></i> ${dateStr}</div>
+                <div class="modal-body">${escapeHtml(postData.texto || '')}</div>
+                ${filesHtml ? `<div class="modal-files">${filesHtml}</div>` : '<p style="color:#9ca3af; font-style:italic;">Sin archivos adjuntos</p>'}
+            `;
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePostModal() {
+            document.getElementById('postModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function formatModalDate(timestamp) {
+            if (!timestamp) return { date: '', time: '' };
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            let hours = date.getHours();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return {
+                date: date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }),
+                time: hours + ':' + minutes + ' ' + ampm
+            };
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closePostModal();
+        });
+
+        document.getElementById('postModal').addEventListener('click', function(e) {
+            if (e.target === this) closePostModal();
+        });
+
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn-view');
+            if (btn && btn.dataset.postId) {
+                e.preventDefault();
+                openPostModal(btn.dataset.postId);
+            }
+        });
+    </script>
+
 </body>
 
 </html>
