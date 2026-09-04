@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel de administración</title>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* ----- Reset y estilos globales ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 2.5rem;
+            border-radius: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .container:hover {
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.10);
+        }
+
+        /* Encabezado */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .header-left h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4a6cf7, #6a3de8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .header-left .subtitle {
+            font-size: 1rem;
+            color: #64748b;
+            margin-top: 0.2rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .welcome-badge {
+            background: linear-gradient(135deg, #4a6cf7, #6a3de8);
+            color: #fff;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(74, 108, 247, 0.25);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: 1.5px solid #e2e8f0;
+            padding: 0.5rem 1.4rem;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #1e293b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-logout:hover {
+            background: #fee2e2;
+            border-color: #f87171;
+            color: #b91c1c;
+        }
+
+        /* Tarjetas de sección */
+        .section-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .section-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.8rem;
+            color: #0f172a;
+        }
+
+        .section-title .emoji {
+            font-size: 1.8rem;
+        }
+
+        /* Formularios */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 1rem;
+            background: #f8fafc;
+            transition: border 0.2s, box-shadow 0.2s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #4a6cf7;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(74, 108, 247, 0.10);
+            background: #ffffff;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .file-input-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            flex: 1;
+            padding: 0.6rem;
+            border: 2px dashed #cbd5e1;
+            border-radius: 14px;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: border 0.2s;
+        }
+
+        .file-input-wrapper input[type="file"]:hover {
+            border-color: #4a6cf7;
+        }
+
+        .file-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin: 0.8rem 0;
+        }
+
+        .file-tag {
+            background: #eef2ff;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #1e293b;
+            border: 1px solid #c7d2fe;
+        }
+
+        .file-tag .remove {
+            cursor: pointer;
+            color: #ef4444;
+            font-weight: 700;
+            font-size: 1.1rem;
+            line-height: 1;
+            transition: transform 0.2s;
+        }
+
+        .file-tag .remove:hover {
+            transform: scale(1.2);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        /* Botones */
+        .btn {
+            padding: 0.7rem 1.8rem;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4a6cf7, #6a3de8);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(74, 108, 247, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 108, 247, 0.35);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #e2e8f0;
+            color: #1e293b;
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+
+        .btn-sm {
+            padding: 0.35rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        /* Listado de publicaciones */
+        .post-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .post-item {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 20px;
+            border-left: 6px solid #4a6cf7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease;
+        }
+
+        .post-item:hover {
+            background: #ffffff;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .post-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .post-meta {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .post-body {
+            color: #334155;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 0.5rem 0 0.8rem 0;
+            line-height: 1.6;
+        }
+
+        .post-files {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .post-files a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem 0.9rem;
+            background: #e9ecf2;
+            border-radius: 30px;
+            text-decoration: none;
+            color: #1e293b;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+
+        .post-files a:hover {
+            background: #d5dce6;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .empty {
+            color: #94a3b8;
+            font-style: italic;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        /* Usuarios */
+        .user-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            align-items: flex-end;
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 20px;
+        }
+
+        .user-form .form-group {
+            flex: 1 1 180px;
+            margin-bottom: 0;
+        }
+
+        .user-form .form-actions {
+            margin-top: 0;
+        }
+
+        .user-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 1.2rem;
+        }
+
+        .user-tag {
+            background: #eef2ff;
+            padding: 0.3rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            border: 1px solid #c7d2fe;
+            color: #1e293b;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #1e293b;
+            color: #fff;
+            padding: 0.8rem 1.8rem;
+            border-radius: 40px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+            z-index: 999;
+            font-weight: 500;
+            backdrop-filter: blur(8px);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.8rem;
+            }
+
+            .header-right {
+                justify-content: space-between;
+            }
+
+            .section-card {
+                padding: 1.2rem;
+            }
+
+            .user-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .user-form .form-group {
+                flex: 1 1 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .container {
+                padding: 1rem;
+                border-radius: 20px;
+            }
+
+            .section-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Encabezado -->
+        <div class="header">
+            <div class="header-left">
+                <h1>📋 Panel de administración</h1>
+                <div class="subtitle">Gestiona tus publicaciones y usuarios</div>
+            </div>
+            <div class="header-right">
+                <span class="welcome-badge" id="welcomeMessage">👋 Bienvenido, Usuario</span>
+                <button class="btn-logout" id="logoutBtn">Cerrar sesión</button>
+            </div>
+        </div>
+
+        <!-- SECCIÓN: CREAR/EDITAR PUBLICACIÓN -->
+        <div class="section-card">
+            <div class="section-title">
+                <span class="emoji">✏️</span>
+                <span id="formTitle">Nueva publicación</span>
+            </div>
+            <form id="postForm">
+                <input type="hidden" id="postId" value="" />
+
+                <div class="form-group">
+                    <label for="postTitle">Título</label>
+                    <input type="text" id="postTitle" placeholder="Ej: Mi primer post" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="postText">Contenido</label>
+                    <textarea id="postText" placeholder="Escribe el contenido de tu publicación..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Archivos adjuntos</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileInput" multiple accept="image/*,video/*,.pdf" />
+                        <button type="button" class="btn btn-primary btn-sm" id="uploadFilesBtn">⬆️ Subir
+                            archivos</button>
+                    </div>
+                    <div id="fileList" class="file-list"></div>
+                    <small style="color:#64748b;">Puedes seleccionar varios archivos. Se subirán a Cloudinary.</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="savePostBtn">💾 Guardar publicación</button>
+                    <button type="button" class="btn btn-outline" id="cancelEditBtn" style="display:none;">↩️ Cancelar
+                        edición</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- SECCIÓN: LISTADO DE PUBLICACIONES -->
+        <div class="section-card">
+            <div class="section-title">
+                <span class="emoji">📄</span>
+                Publicaciones existentes
+            </div>
+            <div id="postsContainer" class="post-list">
+                <p class="empty">Cargando publicaciones...</p>
+            </div>
+        </div>
+
+        <!-- SECCIÓN: CREAR USUARIOS -->
+        <div class="section-card">
+            <div class="section-title">
+                <span class="emoji">👤</span>
+                Crear nuevo usuario
+            </div>
+            <form id="userForm" class="user-form">
+                <div class="form-group">
+                    <label for="userEmail">Correo electrónico</label>
+                    <input type="email" id="userEmail" placeholder="nuevo@ejemplo.com" required />
+                </div>
+                <div class="form-group">
+                    <label for="userPassword">Contraseña</label>
+                    <input type="password" id="userPassword" placeholder="Mínimo 6 caracteres" required minlength="6" />
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">➕ Crear usuario</button>
+                </div>
+            </form>
+            <div id="userList" class="user-list">
+                <span class="empty">No hay usuarios adicionales.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script src="js/panel.js"></script>
+</body>
+
+</html>

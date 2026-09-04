@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plataforma · Publicaciones</title>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+      padding: 2rem 1rem;
+      color: #1a2634;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .sub {
+      color: #6b7a8a;
+      margin-bottom: 2rem;
+    }
+    .post {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      margin-bottom: 2rem;
+    }
+    .post-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .post-text {
+      white-space: pre-wrap;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    .post-files {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-top: 0.5rem;
+    }
+    .post-files a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.8rem;
+      background: #e9ecf2;
+      border-radius: 20px;
+      text-decoration: none;
+      color: #1a2634;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+    .post-files a:hover {
+      background: #d5dce6;
+    }
+    .post img, .post video {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 0.5rem;
+    }
+    .empty {
+      color: #8a9aa8;
+      font-style: italic;
+      text-align: center;
+      padding: 2rem;
+    }
+    .meta {
+      color: #8a9aa8;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📢 Publicaciones</h1>
+    <p class="sub">Contenido generado desde el panel de administración</p>
+    <div id="postsContainer">
+      <p class="empty">Cargando publicaciones...</p>
+    </div>
+  </div>
+
+  <script>
+    // ----- CONFIGURACIÓN (reemplaza con tus credenciales) -----
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_PROYECTO.firebaseapp.com",
+      projectId: "TU_PROYECTO",
+      storageBucket: "TU_PROYECTO.appspot.com",
+      messagingSenderId: "TU_SENDER_ID",
+      appId: "TU_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // ----- Cargar publicaciones -----
+    const container = document.getElementById('postsContainer');
+
+    async function loadPosts() {
+      try {
+        const snapshot = await db.collection('publicaciones')
+          .orderBy('createdAt', 'desc')
+          .get();
+
+        if (snapshot.empty) {
+          container.innerHTML = '<p class="empty">No hay publicaciones disponibles.</p>';
+          return;
+        }
+
+        let html = '';
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const files = data.archivos || [];
+          let filesHtml = '';
+          files.forEach(f => {
+            let icon = '📄';
+            if (f.type.startsWith('image/')) {
+              icon = '🖼️';
+              // Mostrar imagen
+              filesHtml += `<img src="${f.url}" alt="${f.name}" style="max-width:100%;border-radius:8px;margin-top:8px;" />`;
+            } else if (f.type.startsWith('video/')) {
+              icon = '🎬';
+              filesHtml += `<video controls style="max-width:100%;border-radius:8px;margin-top:8px;"><source src="${f.url}" type="${f.type}"></video>`;
+            } else {
+              icon = '📕';
+              filesHtml += `<a href="${f.url}" target="_blank" download="${f.name}">${icon} ${f.name}</a>`;
+            }
+          });
+
+          html += `
+            <div class="post">
+              <div class="post-title">${escapeHtml(data.titulo || 'Sin título')}</div>
+              <div class="post-text">${escapeHtml(data.texto || '')}</div>
+              <div class="post-files">${filesHtml}</div>
+              <div class="meta">${data.createdAt ? new Date(data.createdAt.toMillis()).toLocaleDateString() : ''}</div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+      } catch (error) {
+        console.error('Error cargando publicaciones:', error);
+        container.innerHTML = '<p class="empty">Error al cargar las publicaciones.</p>';
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Cargar al inicio
+    loadPosts();
+  </script>
+</body>
+</html>
